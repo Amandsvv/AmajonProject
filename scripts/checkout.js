@@ -37,9 +37,9 @@ cart.forEach((cartItem) => {
             <span>
               Quantity: <span class="quantity-label">${cartItem.quantity}</span>
             </span>
-            <span class="update-quantity-link link-primary">
-              Update
-            </span>
+            <span class="update-quantity-link link-primary" data-product-id="${matchingProduct.id}">Update</span>
+            <input class="quantity-input" type="number" data-product-id="${matchingProduct.id}">
+            <span class="save-quantity-link link-primary" data-product-id="${matchingProduct.id}">Save</span>
             <span class="delete-quantity-link link-primary js-delete-link" data-product-id="${matchingProduct.id}">
               Delete
             </span>
@@ -98,7 +98,7 @@ cart.forEach((cartItem) => {
 let checkout = `
  <div class="header-content">
     <div class="checkout-header-left-section">
-      <a href="amazon.html">
+      <a href="index.html">
         <img class="amazon-logo" src="images/amazon-logo.png">
         <img class="amazon-mobile-logo" src="images/amazon-mobile-logo.png">
       </a>
@@ -106,7 +106,7 @@ let checkout = `
 
     <div class="checkout-header-middle-section">
       Checkout (<a class="return-to-home-link"
-        href="amazon.html">${quantity} items</a>)
+        href="index.html">${quantity} items</a>)
     </div>
 
     <div class="checkout-header-right-section">
@@ -114,7 +114,7 @@ let checkout = `
     </div>
   </div>`;
 
-  document.querySelector('.js-checkout-header').innerHTML = checkout;
+document.querySelector('.js-checkout-header').innerHTML = checkout;
 
 document.querySelector('.js-order-summary')
   .innerHTML = cartSummaryHTML;
@@ -129,5 +129,54 @@ document.querySelectorAll('.js-delete-link')
         `.js-cart-item-container-${productId}`
       );
       container.remove();
+      quantity = updateCartQuantity();
+      document.querySelector('.return-to-home-link').innerHTML = `${quantity} items`;
     });
   });
+
+  function toggleDisplay(productId) {
+    const updateBtn = document.querySelectorAll('.update-quantity-link');
+    const inputBtn = document.querySelectorAll('.quantity-input');
+    const saveBtn = document.querySelectorAll('.save-quantity-link');
+  
+    updateBtn.forEach((btn) => {
+      if (btn.dataset.productId === productId) {
+        btn.style.display = btn.style.display === 'none' ? 'inline' : 'none';
+      }
+    });
+  
+    inputBtn.forEach((input) => {
+      if (input.dataset.productId === productId) {
+        input.style.display = input.style.display === 'none' ? 'inline' : 'none';
+      }
+    });
+  
+    saveBtn.forEach((btn) => {
+      if (btn.dataset.productId === productId) {
+        btn.style.display = btn.style.display === 'none' ? 'inline' : 'none';
+      }
+    });
+  }
+  
+document.querySelectorAll('.update-quantity-link')
+.forEach((link) => {
+  link.addEventListener('click', () => {
+    const productId = link.dataset.productId;
+    toggleDisplay(productId)
+  });
+});
+
+document.querySelectorAll('.save-quantity-link')
+.forEach((link) => {
+  link.addEventListener('click', () => {
+    const productId = link.dataset.productId;
+    const inputbtns = document.querySelectorAll('.quantity-input');
+    inputbtns.forEach((inputBtn)=>{
+      if(inputBtn.dataset.productId === productId){
+        quantity = inputBtn.value;
+        document.querySelector('.quantity-label').innerHTML = quantity;
+        toggleDisplay(productId);
+      }
+    })
+  });
+});

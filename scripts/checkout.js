@@ -1,6 +1,6 @@
-import {cart, removeFromCart,updateCartQuantity} from '../data/cart.js';
-import {products} from '../data/products.js';
-import {formatCurrency} from './utils/money.js';
+import { cart, removeFromCart, updateCartQuantity, saveTheUpdatedQuantity } from '../data/cart.js';
+import { products } from '../data/products.js';
+import { formatCurrency } from './utils/money.js';
 
 let cartSummaryHTML = '';
 let quantity = updateCartQuantity();
@@ -35,7 +35,7 @@ cart.forEach((cartItem) => {
           </div>
           <div class="product-quantity">
             <span>
-              Quantity: <span class="quantity-label">${cartItem.quantity}</span>
+              Quantity: <span class="quantity-label" data-product-id="${matchingProduct.id}">${cartItem.quantity}</span>
             </span>
             <span class="update-quantity-link link-primary" data-product-id="${matchingProduct.id}">Update</span>
             <input class="quantity-input" type="number" data-product-id="${matchingProduct.id}">
@@ -134,49 +134,84 @@ document.querySelectorAll('.js-delete-link')
     });
   });
 
-  function toggleDisplay(productId) {
-    const updateBtn = document.querySelectorAll('.update-quantity-link');
-    const inputBtn = document.querySelectorAll('.quantity-input');
-    const saveBtn = document.querySelectorAll('.save-quantity-link');
-  
-    updateBtn.forEach((btn) => {
-      if (btn.dataset.productId === productId) {
-        btn.style.display = btn.style.display === 'none' ? 'inline' : 'none';
-      }
-    });
-  
-    inputBtn.forEach((input) => {
-      if (input.dataset.productId === productId) {
-        input.style.display = input.style.display === 'none' ? 'inline' : 'none';
-      }
-    });
-  
-    saveBtn.forEach((btn) => {
-      if (btn.dataset.productId === productId) {
-        btn.style.display = btn.style.display === 'none' ? 'inline' : 'none';
-      }
-    });
-  }
-  
-document.querySelectorAll('.update-quantity-link')
-.forEach((link) => {
-  link.addEventListener('click', () => {
-    const productId = link.dataset.productId;
-    toggleDisplay(productId)
-  });
-});
+function toggleDisplay(productId) {
+  const updateBtn = document.querySelectorAll('.update-quantity-link');
+  const inputBtn = document.querySelectorAll('.quantity-input');
+  const saveBtn = document.querySelectorAll('.save-quantity-link');
 
-document.querySelectorAll('.save-quantity-link')
-.forEach((link) => {
-  link.addEventListener('click', () => {
-    const productId = link.dataset.productId;
-    const inputbtns = document.querySelectorAll('.quantity-input');
-    inputbtns.forEach((inputBtn)=>{
-      if(inputBtn.dataset.productId === productId){
-        quantity = inputBtn.value;
-        document.querySelector('.quantity-label').innerHTML = quantity;
-        toggleDisplay(productId);
+  updateBtn.forEach((btn) => {
+    if (btn.dataset.productId === productId) {
+      // If the update button is currently visible
+      if (btn.style.display !== 'none') {
+        btn.style.display = 'none'; // Hide the update button
+
+        // Show the input field and save button as inline elements
+        inputBtn.forEach((input) => {
+          if (input.dataset.productId === productId) {
+            input.style.display = 'inline';
+          }
+        });
+
+        saveBtn.forEach((btn) => {
+          if (btn.dataset.productId === productId) {
+            btn.style.display = 'inline';
+          }
+        });
+      } else {
+        btn.style.display = 'inline'; // Show the update button again
+
+        // Hide the input field and save button
+        inputBtn.forEach((input) => {
+          if (input.dataset.productId === productId) {
+            input.style.display = 'none';
+          }
+        });
+
+        saveBtn.forEach((btn) => {
+          if (btn.dataset.productId === productId) {
+            btn.style.display = 'none';
+          }
+        });
       }
-    })
+    }
   });
-});
+}
+
+
+document.querySelectorAll('.update-quantity-link')
+  .forEach((link) => {
+    link.addEventListener('click', () => {
+      const productId = link.dataset.productId;
+      toggleDisplay(productId)
+    });
+  });
+
+  function saveTheChanges(productId){
+    
+  }
+document.querySelectorAll('.save-quantity-link')
+  .forEach((link) => {
+    link.addEventListener('click', () => {
+      const productId = link.dataset.productId;
+      const inputbtns = document.querySelectorAll('.quantity-input');
+      let QuantityLabel = document.querySelectorAll('.quantity-label');
+
+      inputbtns.forEach((inputBtn) => {
+        if (inputBtn.dataset.productId === productId) {
+          quantity = parseInt(inputBtn.value);
+          saveTheUpdatedQuantity(productId, quantity);
+
+          QuantityLabel.forEach((label) => {
+            if (label.dataset.productId === productId) {
+              label.innerHTML = quantity;
+            }
+          });
+
+          quantity = updateCartQuantity();
+          document.querySelector('.return-to-home-link').innerHTML = `${quantity} items`;
+          
+          toggleDisplay(productId);
+        }
+      })
+    });
+  });

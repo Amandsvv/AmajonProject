@@ -46,8 +46,17 @@ export function updateCartQuantity() {
   let cartQuantity = 0;
 
   cart.forEach((cartItem) => {
-    cartQuantity += cartItem.quantity;
+    cartQuantity += parseInt(cartItem.quantity);
   });
-
   return cartQuantity;
+}
+
+export function saveTheUpdatedQuantity(productId,quantity){
+  cart.forEach((cartItem)=>{
+    if(cartItem.productId === productId){
+      console.log(typeof(quantity));
+      cartItem.quantity = quantity;
+    }
+  });
+  saveToStorage();
 }

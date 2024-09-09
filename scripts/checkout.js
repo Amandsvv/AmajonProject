@@ -1,4 +1,4 @@
-import { cart, removeFromCart, updateCartQuantity, saveTheUpdatedQuantity } from '../data/cart.js';
+import { cart, removeFromCart, updateCartQuantity,updateDeliveryOption, saveTheUpdatedQuantity } from '../data/cart.js';
 import { products } from '../data/products.js';
 import { formatCurrency } from './utils/money.js';
 import dayjs from 'https://unpkg.com/dayjs@1.11.10/esm/index.js';
@@ -29,8 +29,11 @@ cart.forEach((cartItem) => {
   deliveryOptions.forEach((option)=>{
     if (option.id === deliveryOptionId) {
       deliveryOption = option;
+      console.log("if runned");
     }
   });
+
+console.log(deliveryOption);  
 
   const today = dayjs();
   const deliveryDate = today.add(deliveryOption.deliveryDays,'days');
@@ -71,14 +74,14 @@ cart.forEach((cartItem) => {
           <div class="delivery-options-title">
             Choose a delivery option:
           </div>
-          ${deliiverOptionsHTML(matchingProduct,cartItem)}
+          ${deliveryOptionsHTML(matchingProduct,cartItem)}
         </div>
       </div>
     </div>
   `;
 });
 
-function deliiverOptionsHTML(matchingProduct,cartItem) {
+function deliveryOptionsHTML(matchingProduct,cartItem) {
   let html = '';
 
   deliveryOptions.forEach((deliveryOption)=>{
@@ -90,7 +93,9 @@ function deliiverOptionsHTML(matchingProduct,cartItem) {
     const deliveryDateStr = deliveryDate.format('dddd, MMMM D'); 
     const ischecked = deliveryOption.id === cartItem.deliveryOptionId;
     html+=
-    ` <div class="delivery-option">
+    ` <div class="delivery-option js-delivery-option"
+        data-product-id="${matchingProduct.id}"
+        data-deliver-opyion-id="${deliveryOption.id}">
         <input type="radio" ${ischecked?'checked':''}
           class="delivery-option-input"
           name="delivery-option-${matchingProduct.id}">
@@ -228,3 +233,11 @@ document.querySelectorAll('.save-quantity-link')
       })
     });
   });
+
+  document.querySelectorAll('.js-delivery-option').forEach((element)=>{
+    element.addEventListener('click',()=>{
+      const {productId,deliveryOptionId} = element.dataset;
+      updateDeliveryOption(productId,deliveryOptionId);
+    })
+  })
+

@@ -6,11 +6,6 @@ import { deliveryOptions } from '../data/deliveryOption.js'
 let cartSummaryHTML = '';
 let quantity = updateCartQuantity();
 
-const D = dayjs();
-const deliveryDate = D.add(7, 'days');
-const deliveryDateHTML = deliveryDate.format('dddd, MMMM D');
-console.log(deliveryDateHTML);
-
 cart.forEach((cartItem) => {
   const productId = cartItem.productId;
 
@@ -21,19 +16,15 @@ cart.forEach((cartItem) => {
       matchingProduct = product;
     }
   });
-
   const deliveryOptionId = cartItem.deliveryOptionId;
 
   let deliveryOption;
 
   deliveryOptions.forEach((option)=>{
-    if (option.id === deliveryOptionId) {
+    if (option.id == deliveryOptionId) {
       deliveryOption = option;
-      console.log("if runned");
     }
   });
-
-console.log(deliveryOption);  
 
   const today = dayjs();
   const deliveryDate = today.add(deliveryOption.deliveryDays,'days');
@@ -91,11 +82,10 @@ function deliveryOptionsHTML(matchingProduct,cartItem) {
     const deliveryDate = today.add(deliveryOption.deliveryDays,'days');
 
     const deliveryDateStr = deliveryDate.format('dddd, MMMM D'); 
-    const ischecked = deliveryOption.id === cartItem.deliveryOptionId;
+    const ischecked = deliveryOption.id == cartItem.deliveryOptionId;
     html+=
     ` <div class="delivery-option js-delivery-option"
-        data-product-id="${matchingProduct.id}"
-        data-deliver-opyion-id="${deliveryOption.id}">
+        data-product-id="${matchingProduct.id}" data-delivery-option-id="${deliveryOption.id}">
         <input type="radio" ${ischecked?'checked':''}
           class="delivery-option-input"
           name="delivery-option-${matchingProduct.id}">
@@ -204,9 +194,7 @@ document.querySelectorAll('.update-quantity-link')
     });
   });
 
-function saveTheChanges(productId) {
 
-}
 document.querySelectorAll('.save-quantity-link')
   .forEach((link) => {
     link.addEventListener('click', () => {
@@ -237,6 +225,7 @@ document.querySelectorAll('.save-quantity-link')
   document.querySelectorAll('.js-delivery-option').forEach((element)=>{
     element.addEventListener('click',()=>{
       const {productId,deliveryOptionId} = element.dataset;
+      console.log(productId,deliveryOptionId);
       updateDeliveryOption(productId,deliveryOptionId);
     })
   })
